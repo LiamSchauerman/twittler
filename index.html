@@ -1,6 +1,49 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <style type="text/css">
+    #outer {
+      background-color: lightgreen;
+      border: 1px solid black;
+      width:500px;
+      margin:auto;
+      text-align: center;
+      font-size:16pt;
+      padding-top:8px;
+      padding:4px;
+    }
+    #newTweets {
+      display:block;
+      font-weight:bold;
+      margin:auto;
+      padding:4px;
+      margin-top:5px;
+      margin-bottom:5px;
+    }
+    .tweet{
+      background-color:#72DFF2;
+      margin:2px;
+      padding:4px;
+      display:block;
+      text-align:left;
+      font-size:13pt;
+    }
+    .user:hover {
+      color:white;
+    }
+    .highlight {
+      background-color:#32CAE6;
+    }
+    #userTweets {
+      position:absolute;
+      display:none;
+      width:490px;
+      border: 2px solid black;
+      min-height: 200px;
+      background-color:white;
+      padding:4px;
+    }
+    </style>
     <script src="jquery.js"></script>
     <script src="data_generator.js"></script>
   </head>
@@ -8,20 +51,72 @@
     <script>
 
       $(document).ready(function(){
-        var $body = $('body');
-        $body.html('');
+        //defining showTweets()
+        //refreshes list of tweets
+        var showTweets = function(){
+          $("#tweets").html("")
+          var index = streams.home.length - 1;
+          while(index >= 0){
+            var tweet = streams.home[index];
+            var $tweet = $('<div class="tweet"></div>');
+            $tweet.html('<span class="user">@' + tweet.user + '</span>: ' + tweet.message + "<br><span style='font-size:8pt'>"+tweet.created_at+"</span>");
+            $tweet.appendTo($("#tweets"));
+            index -= 1;
+          }
+        };
+        showTweets();
 
-        var index = streams.home.length - 1;
-        while(index >= 0){
-          var tweet = streams.home[index];
-          var $tweet = $('<div></div>');
-          $tweet.text('@' + tweet.user + ': ' + tweet.message);
-          $tweet.appendTo($body);
-          index -= 1;
+      //checks if there are more tweets in streams.home, then prepends them to #tweet
+      var autoTweet = function(){
+        var prevIndex = $(".tweet").length;
+        var index = streams.home.length-1;
+        //prevIndex is 10, index is 13, we want to get 11, 12, and 13
+        if(index > prevIndex) {
+          for(var i = prevIndex+1; i<index ; i++) {
+            var tweet = streams.home[i];
+            var $tweet = $('<div class="tweet"></div>');
+            $tweet.html('<span class="user">@' + tweet.user + '</span>: ' + tweet.message + "<br><span style='font-size:8pt'>"+tweet.created_at+"</span>");
+            $("#tweets").prepend($tweet);
+          }
         }
+      }
+      timer = setInterval(autoTweet, 5000)
 
-      });
+      //show user new tweets on button click
+        $('button').on("click", showTweets)
+      //toggle highlight class on mouseenter/mouseleave
+      //this only works for the first set of tweets?
+        $(".tweet").on("mouseenter", function(){
+          $(this).addClass("highlight");
+        });
+        $(".tweet").on("mouseleave", function(){
+          $(this).removeClass("highlight");
+        });
 
+        // event handler for clicking on usernames
+        $(".user").on("click", function(){
+          var username = $(this).text().substring(1);
+          $("#userTweets").text(username+" tweets will go here")
+          $("#userTweets").fadeIn(200);
+        })
+        //hides userTweets on click
+        $("#userTweets").on("click", function(){
+          $(this).fadeOut(100);
+        })
+
+
+      }); //end of ready block
     </script>
+    <div id="outer">
+      <strong>Twittler</strong><hr width='80%' />
+      <button id="refresh">Refresh tweets</button>
+      <div id="userTweets"></div>
+      <div id="tweets"></div>
+    </div>
   </body>
 </html>
+<!-- users is an array of strings of each username -->
+<!-- streams {
+home : array of all tweets from users you follow
+users : {username : tweets}
+} -->
