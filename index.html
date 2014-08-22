@@ -95,8 +95,16 @@
 
         // event handler for clicking on usernames
         $(".user").on("click", function(){
+          $("#userTweets").html("")
           var username = $(this).text().substring(1);
-          $("#userTweets").text(username+" tweets will go here")
+          var header = "<div>Tweets from @"+username+"</div>"
+          for(var i=0; i<streams.users[username].length; i++){
+            var tweet = streams.users[username][i]
+            var $tweet = $('<div class="tweet"></div>');
+            $tweet.html('<span class="user">@' + tweet.user + '</span>: ' + tweet.message + "<br><span style='font-size:8pt'>"+tweet.created_at+"</span>");
+            $("#userTweets").prepend($tweet);          
+          }
+          $("#userTweets").prepend(header)
           $("#userTweets").fadeIn(200);
         })
         //hides userTweets on click
