@@ -51,7 +51,6 @@
     <script>
 
       $(document).ready(function(){
-        //defining showTweets()
         //refreshes list of tweets
         var showTweets = function(){
           $("#tweets").html("")
@@ -70,7 +69,6 @@
       var autoTweet = function(){
         var prevIndex = $(".tweet").length;
         var index = streams.home.length-1;
-        //prevIndex is 10, index is 13, we want to get 11, 12, and 13
         if(index > prevIndex) {
           for(var i = prevIndex+1; i<index ; i++) {
             var tweet = streams.home[i];
@@ -80,21 +78,20 @@
           }
         }
       }
-      timer = setInterval(autoTweet, 5000)
 
-      //show user new tweets on button click
+      //refresh tweets on button click
         $('button').on("click", showTweets)
+
       //toggle highlight class on mouseenter/mouseleave
-      //this only works for the first set of tweets?
-        $(".tweet").on("mouseenter", function(){
+        $("#tweets").on("mouseenter", ".tweet", function(){
           $(this).addClass("highlight");
         });
-        $(".tweet").on("mouseleave", function(){
+        $("#tweets").on("mouseleave", ".tweet", function(){
           $(this).removeClass("highlight");
         });
 
         // event handler for clicking on usernames
-        $(".user").on("click", function(){
+        $("#tweets").on("click", ".user", function(){
           $("#userTweets").html("")
           var username = $(this).text().substring(1);
           var header = "<div>Tweets from @"+username+"</div>"
@@ -107,11 +104,13 @@
           $("#userTweets").prepend(header)
           $("#userTweets").fadeIn(200);
         })
+
         //hides userTweets on click
         $("#userTweets").on("click", function(){
           $(this).fadeOut(100);
         })
 
+      timer = setInterval(autoTweet, 5000)
 
       }); //end of ready block
     </script>
@@ -123,8 +122,3 @@
     </div>
   </body>
 </html>
-<!-- users is an array of strings of each username -->
-<!-- streams {
-home : array of all tweets from users you follow
-users : {username : tweets}
-} -->
